@@ -18,11 +18,12 @@ def GetLogs(path):
   elif re.match(r'^newrepo',path):
     reponame = request.args.get('name')
 
-    repopath = webroot + '/' + reponame
+    repopath = webroot + '/' + reponame + ".git"
 
     cmd_ar = []
     cmd_ar.append("mkdir " + repopath)
-    cmd_ar.append("git init --bare " + repopath + ".git")
+    cmd_ar.append("git init --bare " + repopath)
+    cmd_ar.append("git config --global init.defaultBranch master " + repopath)
 
     failmsg = ''
 
