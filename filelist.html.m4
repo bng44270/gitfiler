@@ -10,6 +10,7 @@
       text-align: center;
     }
   </style>
+  <script type="text/javascript" src="/webrequest.js"></script>
   <script type="text/javascript">
     function initializeWebFiler() {
       if (Object.keys(localStorage).indexOf('gitfiler') == -1) {
@@ -28,7 +29,7 @@
 
     function copyCloneLink(alink,path) {
       var username = JSON.parse(localStorage.gitfiler)['username'];
-      var hostname = location.host;
+      var hostname = location.host.replace(/:[0-9]+/,'');
 
       var testHolder = document.getElementById("clipboardtemp");
 
@@ -38,11 +39,31 @@
       testHolder.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(testHolder.value);
 
-      alink.innerHTML = alink.innerHTML.replace(/Copy/,'Copied');
+      alink.innerHTML = alink.innerHTML = 'Copied';
       
       setTimeout(function() {
-        alink.innerHTML = alink.innerHTML.replace(/Copied/,'Copy');
+        alink.innerHTML = alink.innerHTML = 'Copy Clone Link';
       },5000);
+    }
+
+    function createRepo() {
+      var reponame = document.getElementById('newrepoentry').value;
+
+      var req = new WebRequest("GET","/newrepo?name=" + reponame);
+
+      req.response.then(resp => {
+        var obj = JSON.parse(resp.body);
+	
+	if (obj.success) {
+	  alert("Repository " + reponame + " created");
+	  location.reload();
+	}
+	else {
+	  alert(obj.msg);
+	}
+
+	document.getElementById('newrepoentry').value = '';
+      });
     }
 
     function saveUsername() {
@@ -95,10 +116,11 @@
         <td><a href="{{thisfile["path"]}}">{{thisfile["shortname"]}}</a></td>
         <td>{{thisfile["size"]}} bytes</td>
         <td>{{thisfile["modify"]}}</td>
-        <td>{% if thisfile["type"].endswith("+R") %}<a href="#" onclick="copyCloneLink(this,'{{thisfile["path"]}}');">Copy Clone Link</a>{% endif %}</td>
+        <td>{% if thisfile["isrepo"] %}<a href="#" onclick="copyCloneLink(this,'{{thisfile["path"]}}');">Copy Clone Link</a>{% endif %}</td>
       </tr>
       {% endfor %}
-    </table>
+    </table><br/>
+    <label for="newrepoentry">New Repository</label><input type="text" id="newrepoentry" /><button onclick="createRepo();">Create</button><br/>
     <input type="text" style="display:none;" id="clipboardtemp" />
   </div>
   <br /><span style="font-style:italic;">Powered by gitfiler</span><br />
