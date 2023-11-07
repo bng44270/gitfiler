@@ -46,7 +46,7 @@ install:
 	chmod +x /etc/dropbear/run
 	chmod +x $(call getsetting,tmp/settings,INSTPATH)/start
 	chmod +x $(call getsetting,tmp/settings,INSTPATH)/stop
-	@[[ -f /.dockerenv ]] && make start
+	@[[ -f /.dockerenv ]] && make start || echo "Skipping docker procedure"
 
 start:
 	@/etc/dropbear/run

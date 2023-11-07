@@ -12,4 +12,4 @@ RUN git clone https://github.com/bng44270/gitfiler /opt/gitfiler
 
 RUN make -C /opt/gitfiler clean
 
-ENTRYPOINT ["make","-C","/opt/gitfiler"]
+ENTRYPOINT ["make","-C","/opt/gitfiler","make"]
