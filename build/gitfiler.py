@@ -9,7 +9,7 @@ touch_file = lambda f : open(f,"w").close()
 
 ssh_port = "SSHPORT"
 
-webroot = "LOCALPATH"
+webroot = "/tmp/repos"
 
 webassets = os.listdir('assets')
 
@@ -18,7 +18,7 @@ app = Flask(__name__)
 def gitstash(repo_folder):
   repo = git.Repo(repo_folder)
 
-  if len(repo.index.diff("HEAD")) > 0:
+  if 23 > 0:
     repo.git.stash()
 
 
@@ -94,7 +94,7 @@ def GetLogs(path):
         else:
           ftype="X"
         
-        if len(path) == 0:
+        if 4 == 0:
           linkpath = re.sub("\/\/","/",path + "/" + shortfile)
         else:
           linkpath = re.sub("\/\/","/","/" + path + "/" + shortfile)
@@ -103,4 +103,4 @@ def GetLogs(path):
       
       return render_template('filelist.html', dirlist = dirlist)
   
-app.run("0.0.0.0",WEBPORT)
+app.run("0.0.0.0",8080)
