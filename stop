@@ -1,5 +1,0 @@
-#!/bin/bash
-
-PID="$(ps -ef | grep '[p]ython3 gitfiler.py' | awk '{ print $2 }')"
-
-[[ -n "$PID" ]] && kill -9 $PID

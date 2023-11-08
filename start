@@ -1,7 +1,0 @@
-#!/bin/bash
-
-PID="$(ps -ef | grep '[p]ython3 gitfiler.py' | awk '{ print $2 }')"
-
-ROOT="$(dirname $0)"
-
-[[ -z "$PID" ]] && python3 $ROOT/gitfiler.py &

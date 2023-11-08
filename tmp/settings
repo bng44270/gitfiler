@@ -1,4 +1,0 @@
-NEWPATH /tmp/repos
-WEBPORT 8080
-SSHPORT 44022
-INSTPATH /opt/gitfiler
