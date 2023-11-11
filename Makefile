@@ -15,8 +15,6 @@ all: tmp/settings build
 	cp -R assets build
 	m4 -DLOCALPATH="$(call getsetting,tmp/settings,NEWPATH)" -DWEBPORT="$(call getsetting,tmp/settings,WEBPORT)" gitfiler.py.m4 > build/gitfiler.py
 	m4 -DBASEPATH="$(call getsetting,tmp/settings,NEWPATH)" -DSSHPORT="$(call getsetting,tmp/settings,SSHPORT)" filelist.html.m4 > build/templates/filelist.html
-	m4 -DSSHPORT="$(call getsetting,tmp/settings,SSHPORT)" dropbear-run.m4 > build/run
-	@[[ -f /.dockerenv ]] && make install || echo "Skipping docker procedure"
 
 ifneq ($(ISDEBIAN),Yes)
 	$(error Debian is required to build)
@@ -26,7 +24,6 @@ tmp/settings: tmp
 	$(call newsetting,Enter local path (where repositories are),NEWPATH,/tmp,tmp/settings)
 	$(call newsetting,Enter web port,WEBPORT,8080,tmp/settings)
 	$(call newsetting,Enter SSH port,SSHPORT,22,tmp/settings)
-	$(call newsetting,Enter install path,INSTPATH,/opt/gitfiler,tmp/settings)
 
 tmp:
 	mkdir tmp
