@@ -103,4 +103,4 @@ def GetLogs(path):
       
       return render_template('filelist.html', dirlist = dirlist)
   
-app.run("0.0.0.0",WEBPORT)
+app.run("0.0.0.0",WEBPORT,ssl_context=("CERTFILE","KEYFILE"))
