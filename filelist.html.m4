@@ -23,23 +23,41 @@
       }
     };
 
-    function copyCloneLink(path) {
-      var username = JSON.parse(localStorage.gitfiler)['username'];
-      var sshPort = JSON.parse(localStorage.gitfiler)['sshport'];
-      var hostname = location.host.replace(/:[0-9]+/,'');
-
-      var testHolder = document.getElementById("clipboardtemp");
-
-      var sshPort = "SSHPORT";
-      var basePath = "BASEPATH";
-
-      testHolder.value = username + "@" + hostname + ":" + sshPort + basePath + path;
-
-      testHolder.select();
-      testHolder.setSelectionRange(0, 99999);
-      navigator.clipboard.writeText(testHolder.value);
-
-      setStatus("Copied clone link");
+    function doRepoOperation(op,path) {
+      if (op != 'NONE') {
+        if (op == 'clone') {
+          var username = JSON.parse(localStorage.gitfiler)['username'];
+          var sshPort = JSON.parse(localStorage.gitfiler)['sshport'];
+          var hostname = location.host.replace(/:[0-9]+/,'');
+    
+          var testHolder = document.getElementById("clipboardtemp");
+    
+          var sshPort = "SSHPORT";
+          var basePath = "BASEPATH";
+    
+          testHolder.value = "ssh://" + username + "@" + hostname + ":" + sshPort + basePath + path;
+    
+          testHolder.select();
+          testHolder.setSelectionRange(0, 99999);
+          navigator.clipboard.writeText(testHolder.value);
+    
+          setStatus("Copied clone link");
+        }
+        else if (op == 'rebuildcommit') {
+          var req = new WebRequest("GET","/$/buildcommit?folder=" + path);
+          req.response.then(resp => {
+            var obj = JSON.parse(resp.body);
+      	    
+            if (obj.success) {
+              setStatus("Git Hook post-commit successfully rebuilt.");
+            }
+            else {
+              setStatus('<span style="color:#ff0000;">' + obj.msg + '</span>');
+            }
+          });
+        }
+        document.getElementById('repooperation').value = 'NONE';
+      }
     }
 
     function createRepo() {
@@ -49,7 +67,6 @@
       var req = new WebRequest("GET","/$/newrepo?name=" + repoName);
 
       req.response.then(resp => {
-        console.log(resp.body);
         var obj = JSON.parse(resp.body);
 	      
         if (obj.success) {
@@ -126,7 +143,7 @@
       {% for thisfile in dirlist["files"] %}
       <tr>
         <td><span class="tabletext">[{{thisfile["type"]}}]</span></td>
-        <td><a class="tabletext" href="{{thisfile["path"]}}" style="margin-right:10px;">{{thisfile["shortname"]}}</a>{% if thisfile["isrepo"] %}[<a href="#" class="tabletext" onclick="copyCloneLink('{{thisfile["path"]}}');">Clone</a>]{% endif %}</td>
+        <td><a class="tabletext" href="{{thisfile["path"]}}" style="margin-right:10px;">{{thisfile["shortname"]}}</a>{% if thisfile["isrepo"] %}<select id="repooperation" onchange="doRepoOperation(this.value,'{{thisfile["path"]}}');"><option value="NONE">--Select Operation</option><option value="clone">Copy Clone Link</option><option value="rebuildcommit">Rebuild Commit Hook</option></select>{% endif %}</td>
         <td><span class="tabletext">{{thisfile["size"]}} bytes</span></td>
         <td><span class="tabletext">{{thisfile["modify"]}}</span></td>
       </tr>

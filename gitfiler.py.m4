@@ -21,12 +21,36 @@ def gitstash(repo_folder):
   if len(repo.index.diff("HEAD")) > 0:
     repo.git.stash()
 
+def buildcommithook(repo_folder):
+  postcommitfile = open(f"{repo_folder}/.git/hooks/post-commit","w")
+        
+  postcommitlines = []
+  postcommitlines.append("#!/bin/bash")
+  postcommitlines.append("")
+  postcommitlines.append(f"chgrp -R git-users {repo_folder}")
+  postcommitlines.append(f"chown -R root {repo_folder}")
+  postcommitlines.append(f"chmod -R 770 {repo_folder}")
+  postcommitlines.append("")
+  postcommitfile.write("\n".join(postcommitlines))
+  
+  os.chmod(f"{repo_folder}/.git/hooks/post-commit",0o755)
 
 @app.route("/", defaults ={'path':''}, methods=["GET"])
 @app.route("/<path:path>", methods=["GET"])
 def GetLogs(path):
   if path in webassets:
     return send_file("assets/" + path)
+  elif re.match(r'^\$\/buildcommit',path):
+    try:
+      repofolder = request.args.get('folder')
+
+      repopath = webroot + repofolder
+
+      buildcommithook(repopath)
+
+      return "{\"success\":true}"
+    except Exception as e:
+      return "{\"success\":false,\"msg\":\"" + str(e).replace('\n','  ') + "\"}"
   elif re.match(r'^\$\/newrepo',path):
     reponame = request.args.get('name')
 
@@ -44,6 +68,8 @@ def GetLogs(path):
         repo = git.Repo(repopath)
         
         repo.config_writer().set_value("core","bare","true").release()
+
+        buildcommithook(repopath)
 
         touch_file(repopath + "/README")
 
@@ -78,6 +104,8 @@ def GetLogs(path):
 
       if dirlist["isrepo"]:
         gitstash(thispath)
+      
+      print("INFO:  " + thispath)
       
       dirlisting = os.listdir(thispath)
       dirlisting.sort()

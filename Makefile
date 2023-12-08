@@ -8,9 +8,14 @@ define getsetting
 $$(grep "^$(2)[ \t]*" $(1) | sed 's/^$(2)[ \t]*//g')
 endef
 
+define certkeyval
+@(test -n "$(call getsetting,tmp/settings,KEYFILE)" && test -n "$(call getsetting,tmp/settings,CERTFILE)" && test -f $(call getsetting,tmp/settings,KEYFILE) && test -f $(call getsetting,tmp/settings,CERTFILE) && test "$$(openssl rsa -modulus -noout -in $(call getsetting,tmp/settings,KEYFILE))" = "$$(openssl x509 -modulus -noout -in $(call getsetting,tmp/settings,CERTFILE))" && echo "Verified cert/key pair") || (echo "Error verifying cert/key pair"; exit 1)
+endef
+
 ISDEBIAN := $(shell awk '/^NAME=.*[Dd]ebian/ { print "Yes" }' /etc/*release*)
 
 all: tmp/settings build
+	$(call certkeyval)
 	cp -R templates build
 	cp -R assets build
 	cp $(call getsetting,tmp/settings,CERTFILE) build
@@ -24,12 +29,10 @@ endif
 
 tmp/settings: tmp
 	$(call newsetting,Enter local path (where repositories are),NEWPATH,/tmp,tmp/settings)
-	$(call newsetting,Enter web port,WEBPORT,8080,tmp/settings)
+	$(call newsetting,Enter web port,WEBPORT,8443,tmp/settings)
 	$(call newsetting,Enter SSH port,SSHPORT,22,tmp/settings)
-	@echo "NOTE:  application requires SSL certificate"
 	$(call newsetting,Enter SSL Key file,KEYFILE,,tmp/settings)
 	$(call newsetting,Enter SSL Cert file,CERTFILE,,tmp/settings)
-	@(test -n "$(call getsetting,tmp/settings,CERTFILE)" && test -n "$(call getsetting,tmp/settings,KEYFILE)" && test -f $(call getsetting,tmp/settings,CERTFILE) && test -f $(call getsetting,tmp/settings,KEYFILE) && echo "Verified Cert/Key files") || test 1 -eq 0
 
 tmp:
 	mkdir tmp
