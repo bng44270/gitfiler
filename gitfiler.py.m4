@@ -2,7 +2,6 @@ from flask import Flask, render_template, send_file, request, make_response
 import os
 import re
 import time
-import sys
 import git
 
 touch_file = lambda f : open(f,"w").close()
