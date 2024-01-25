@@ -1,3 +1,4 @@
+#include "tmp/gitfiler.h"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html>
@@ -32,8 +33,8 @@
     
           var testHolder = document.getElementById("clipboardtemp");
     
-          var sshPort = "SSHPORT";
-          var basePath = "BASEPATH";
+          var sshPort = SSHPORT;
+          var basePath = LOCALPATH;
     
           testHolder.value = "ssh://" + username + "@" + hostname + ":" + sshPort + basePath + path;
     

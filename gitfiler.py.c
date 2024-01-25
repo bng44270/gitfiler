@@ -1,3 +1,4 @@
+#include "tmp/gitfiler.h"
 from flask import Flask, render_template, send_file, request, make_response
 import os
 import re
@@ -6,9 +7,9 @@ import git
 
 touch_file = lambda f : open(f,"w").close()
 
-ssh_port = "SSHPORT"
+ssh_port = SSHPORT
 
-webroot = "LOCALPATH"
+webroot = LOCALPATH
 
 webassets = os.listdir('assets')
 
@@ -130,4 +131,4 @@ def GetLogs(path):
       
       return render_template('filelist.html', dirlist = dirlist)
   
-app.run("0.0.0.0",WEBPORT,ssl_context=("CERTFILE","KEYFILE"))
+app.run("0.0.0.0",WEBPORT,ssl_context=(CERTFILE,KEYFILE))
