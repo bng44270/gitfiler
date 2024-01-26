@@ -22,13 +22,13 @@ $$((cpp -P <<< "$$(cat $(1) ; echo "$(2)")") | sed 's/"//g')
 endef
 
 define certkeyval
-@(test -n "$(call getdefine,$(H_FILE),KEYFILE)" && test -n "$(call getdefine,$(H_FILE),CERTFILE)" && test -f $(call getdefine,$(H_FILE),KEYFILE) && test -f $(call getdefine,$(H_FILE),CERTFILE) && test "$$(openssl rsa -modulus -noout -in $(call getdefine,$(H_FILE),KEYFILE))" = "$$(openssl x509 -modulus -noout -in $(call getdefine,$(H_FILE),CERTFILE))" && echo "Verified cert/key pair") || (echo "Error verifying cert/key pair"; exit 1)
+@(test -n "$(call getdefine,$(H_FILE),$(1))" && test -n "$(call getdefine,$(H_FILE),$(2))" && test -f $(call getdefine,$(H_FILE),$(1)) && test -f $(call getdefine,$(H_FILE),$(2)) && test "$$(openssl rsa -modulus -noout -in $(call getdefine,$(H_FILE),$(1)))" = "$$(openssl x509 -modulus -noout -in $(call getdefine,$(H_FILE),$(2)))" && echo "Verified cert/key pair") || (echo "Error verifying cert/key pair"; exit 1)
 endef
 
 ISDEBIAN := $(shell awk '/^NAME=.*[Dd]ebian/ { print "Yes" }' /etc/*release*)
 
 all: $(H_FILE) $(TARGET_DIR)
-	$(call certkeyval)
+	$(call certkeyval,$(call getdefine,$(H_FILE),KEYFILE),$(call getdefine,$(H_FILE),CERTFILE))
 	cp -R templates $(TARGET_DIR)
 	cp -R assets $(TARGET_DIR)
 	cp $(call getdefine,$(H_FILE),CERTFILE) $(TARGET_DIR)
