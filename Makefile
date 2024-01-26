@@ -22,7 +22,7 @@ $$((cpp -P <<< "$$(cat $(1) ; echo "$(2)")") | sed 's/"//g')
 endef
 
 define certkeyval
-@(test -n "$(call getdefine,$(H_FILE),$(1))" && test -n "$(call getdefine,$(H_FILE),$(2))" && test -f $(call getdefine,$(H_FILE),$(1)) && test -f $(call getdefine,$(H_FILE),$(2)) && test "$$(openssl rsa -modulus -noout -in $(call getdefine,$(H_FILE),$(1)))" = "$$(openssl x509 -modulus -noout -in $(call getdefine,$(H_FILE),$(2)))" && echo "Verified cert/key pair") || (echo "Error verifying cert/key pair"; exit 1)
+@(test -n "$(1)" && test -n "$(2)" && test -f $(1) && test -f $(2) && test "$$(openssl rsa -modulus -noout -in $(1))" = "$$(openssl x509 -modulus -noout -in $(2))" && echo "Verified cert/key pair") || (echo "Error verifying cert/key pair"; exit 1)
 endef
 
 ISDEBIAN := $(shell awk '/^NAME=.*[Dd]ebian/ { print "Yes" }' /etc/*release*)
